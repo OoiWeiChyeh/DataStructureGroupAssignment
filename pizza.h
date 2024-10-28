@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+
 using namespace std;
 
 // Pizza class to store details of a pizza
@@ -17,6 +18,18 @@ public:
     Pizza() {}
     Pizza(string n, float s, float m, float l, float xl)
         : name(n), smallPrice(s), mediumPrice(m), largePrice(l), extraLargePrice(xl) {}
+};
+
+class Order {
+	public:
+		string orderID;
+		string pizzaName;
+		int size;
+		int quantity;
+		
+		Order(){}
+		Order(string id, string pizza, int s, int qty)
+			: orderID(id), pizzaName(pizza), size(s), quantity(qty) {}
 };
 
 // Queue class to manage the orders in the kitchen
@@ -88,7 +101,7 @@ public:
         }
     }
 
-    void printQueue() {
+    void printQueue() const{
         Node* current = front;
         while (current != nullptr) {
             cout << current->value << endl;
@@ -98,4 +111,3 @@ public:
 };
 
 #endif
-
