@@ -1,27 +1,33 @@
 #include "pizza.h"
-
+#include <iomanip>
 // Function prototypes
 void loadPizzas(Pizza pizzas[], int& count);
 void displayMenu(const Pizza pizzas[], int count);
 void takeOrder(Queue<string>& orderQueue, const Pizza pizzas[], int count);
+void displayOrders(const Queue<Order>& orderQueue);
 void sendToKitchen(Queue<string>& orderQueue, Queue<string>& kitchenQueue);
 void processQueue(Queue<string>& kitchenQueue);
 
 int main() {
     Pizza pizzas[10];
-    int pizzaCount;
+    int pizzaCount, orderNum = 1;
 
     // Load pizzas from file
     loadPizzas(pizzas, pizzaCount);
 
+
     // Queue for storing orders
     Queue<string> orderQueue;
     Queue<string> kitchenQueue;
-
+		
+		cout << "Welcome to Pizza Kitchen \n";
     int option = 0;
     while (option != 4) {
-        cout << "\n1. Order Pizza\n2. Send to Kitchen\n3. Process Kitchen Queue\n4. Exit\n";
-        cout << "Select an option: ";
+        cout << left << "\n1.  [Order Pizza" << right << setw(17) << " ]" ;
+		cout << left << "\n2.  [Send to Kitchen" << right << setw(13) << " ]";
+		cout << left << "\n3.  [Process with Kitchen Queue" << right << setw(2) << " ]";
+		cout << left << "\n4.  [Exit" << right << setw(26) << " ]\n\n";
+		cout << "Select an option: ";
         cin >> option;
 
         switch (option) {
@@ -44,4 +50,3 @@ int main() {
 
     return 0;
 }
-
