@@ -1,0 +1,47 @@
+#include "pizza.h"
+#include <iomanip>
+
+void loadPizzas(Pizza pizzas[], int& count);
+void displayMenu(const Pizza pizzas[], int count);
+void takeOrder(Queue<Order>& orderQueue, const Pizza pizzas[], int count, int& orderNum);
+void displayReceipt(const Queue<Order>& orderQueue);
+void sendToKitchen(Queue<Order>& orderQueue, Queue<Order>& kitchenQueue);
+void processQueue(Queue<Order>& kitchenQueue);
+
+int main() {
+    Pizza pizzas[10];
+    int pizzaCount, orderNum = 1;
+
+    loadPizzas(pizzas, pizzaCount);
+
+    Queue<Order> orderQueue;
+    Queue<Order> kitchenQueue;
+
+    cout << "Welcome to Pizza Kitchen\n";
+    int option = 0;
+    while (option != 4) {
+        cout << "\n1. Order Pizza\n2. Send to Kitchen\n3. Process Kitchen Queue\n4. Exit\n";
+        cout << "Select an option: ";
+        cin >> option;
+
+        switch (option) {
+            case 1:
+                takeOrder(orderQueue, pizzas, pizzaCount, orderNum);
+                displayReceipt(orderQueue);
+                break;
+            case 2:
+                sendToKitchen(orderQueue, kitchenQueue);
+                break;
+            case 3:
+                processQueue(kitchenQueue);
+                break;
+            case 4:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid option. Try again.\n";
+        }
+    }
+
+    return 0;
+}
