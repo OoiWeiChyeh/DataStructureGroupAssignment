@@ -1,113 +1,65 @@
-#ifndef _PIZZA_
-#define _PIZZA_
+#ifndef PIZZA_H
+#define PIZZA_H
 
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-// Pizza class to store details of a pizza
 class Pizza {
 public:
     string name;
-    float smallPrice;
-    float mediumPrice;
-    float largePrice;
-    float extraLargePrice;
+    float smallPrice, mediumPrice, largePrice, extraLargePrice;
 
-    Pizza() {}
-    Pizza(string n, float s, float m, float l, float xl)
-        : name(n), smallPrice(s), mediumPrice(m), largePrice(l), extraLargePrice(xl) {}
+    // Constructor to initialize pizza details
+    Pizza(const string& name = "", float small = 0, float medium = 0, float large = 0, float xl = 0)
+        : name(name), smallPrice(small), mediumPrice(medium), largePrice(large), extraLargePrice(xl) {}
 };
 
-class Order {
-	public:
-		string orderID;
-		string pizzaName;
-		int size;
-		int quantity;
-		
-		Order(){}
-		Order(string id, string pizza, int s, int qty)
-			: orderID(id), pizzaName(pizza), size(s), quantity(qty) {}
-};
-
-// Queue class to manage the orders in the kitchen
-template <class T>
+// Queue implementation for order and kitchen queue management
+template<typename T>
 class Queue {
 private:
     struct Node {
-        T value;
+        T data;
         Node* next;
     };
-    
     Node* front;
     Node* rear;
-    int numItems;
 
 public:
-    Queue() {
-        front = nullptr;
-        rear = nullptr;
-        numItems = 0;
-    }
+    Queue() : front(nullptr), rear(nullptr) {}
 
-    ~Queue() {
-        clear();
-    }
+    bool isEmpty() const { return front == nullptr; }
 
-    bool isEmpty() {
-        return numItems == 0;
-    }
-
-    void enqueue(T item) {
-        Node* newNode = new Node;
-        newNode->value = item;
-        newNode->next = nullptr;
-
-        if (isEmpty()) {
-            front = newNode;
-            rear = newNode;
-        } else {
+    void enqueue(const T& item) {
+        Node* newNode = new Node{item, nullptr};
+        if (rear) {
             rear->next = newNode;
-            rear = newNode;
+        } else {
+            front = newNode;
         }
-        numItems++;
+        rear = newNode;
     }
 
     void dequeue() {
-        if (isEmpty()) {
-            cout << "The queue is empty." << endl;
-            return;
-        }
-
-        Node* temp = front;
-        front = front->next;
-        delete temp;
-        numItems--;
-    }
-
-    T getFront() {
-        if (isEmpty()) {
-            cout << "The queue is empty." << endl;
-            return T();  // Return default value of T
-        }
-        return front->value;
-    }
-
-    void clear() {
-        while (!isEmpty()) {
-            dequeue();
+        if (!isEmpty()) {
+            Node* temp = front;
+            front = front->next;
+            delete temp;
+            if (!front) rear = nullptr;
         }
     }
 
-    void printQueue() const{
-        Node* current = front;
-        while (current != nullptr) {
-            cout << current->value << endl;
-            current = current->next;
-        }
+    T getFront() const {
+        if (isEmpty()) throw "Queue is empty!";
+        return front->data;
+    }
+
+    ~Queue() {
+        while (!isEmpty()) dequeue();
     }
 };
 
 #endif
+

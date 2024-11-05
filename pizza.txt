@@ -1,0 +1,7 @@
+Blazing Seafood,10,18,24,40
+Chicken Supreme,9,15,22,38
+Hawaiian Supreme,8.9,14.9,20.9,36.9
+Deluxe Cheese,8.8,16.8,21.8,35.5
+Veggie Lover,8.5,14.5,20,5,33.9
+Aloha Chicken,10.5,16.5,25.5,41.5   
+ 
