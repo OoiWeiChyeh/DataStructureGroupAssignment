@@ -1,0 +1,83 @@
+#include "pizza.h"
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <iomanip>
+
+void loadPizzas(Pizza pizzas[], int& count) {
+    ifstream file("pizza.txt");
+    string line;
+    count = 0;
+
+    while (getline(file, line) && count < 10) {
+        istringstream ss(line);
+        string name;
+        float small, medium, large, xl;
+
+        getline(ss, name, ',');
+        ss >> small;
+        ss.ignore();
+        ss >> medium;
+        ss.ignore();
+        ss >> large;
+        ss.ignore();
+        ss >> xl;
+
+        pizzas[count] = Pizza(name, small, medium, large, xl);
+        count++;
+    }
+    file.close();
+}
+
+void displayMenu(const Pizza pizzas[], int count) {
+    cout << "\n=================================== Pizza Menu =================================\n";
+    cout << left << setw(25) << "Pizza Name" << setw(15) << "Small ($)" << setw(15) 
+         << "Medium ($)" << setw(15) << "Large ($)" << setw(15) << "XL ($)" << endl;
+    cout << "--------------------------------------------------------------------------------\n";
+    for (int i = 0; i < count; i++) {
+        cout << i + 1 << ". " << left << setw(20) << pizzas[i].name
+             << setw(15) << pizzas[i].smallPrice
+             << setw(15) << pizzas[i].mediumPrice
+             << setw(15) << pizzas[i].largePrice
+             << setw(15) << pizzas[i].extraLargePrice << endl;
+    }
+}
+
+void takeOrder(vector<Order>& orders, const Pizza pizzas[], int count) {
+    int choice = 0, size = 0, quantity = 0;
+
+    while (choice != -1) {
+        displayMenu(pizzas, count);
+        cout << "Enter the pizza number to order (-1 to finish): ";
+        cin >> choice;
+
+        if (choice > 0 && choice <= count) {
+            cout << "Choose size (1 = Small, 2 = Medium, 3 = Large, 4 = XL): ";
+            cin >> size;
+            cout << "Enter quantity: ";
+            cin >> quantity;
+
+            float price = pizzas[choice - 1].getPrice(size);
+            orders.emplace_back(pizzas[choice - 1].name, size, quantity, price);
+
+            cout << "Added " << pizzas[choice - 1].name << " to your order." << endl;
+        } else if (choice != -1) {
+            cout << "Invalid selection. Please try again." << endl;
+        }
+    }
+}
+
+void displayReceipt(const vector<Order>& orders) {
+    cout << "\n============================== Order Receipt ==============================\n";
+    cout << left << setw(20) << "Pizza Name" << setw(10) << "Size" << setw(10) << "Quantity" << setw(10) << "Total Price" << endl;
+    cout << "--------------------------------------------------------------------------\n";
+
+    float grandTotal = 0;
+    for (const Order& order : orders) {
+        order.displayOrder();
+        grandTotal += order.getTotalPrice();
+    }
+
+    cout << "--------------------------------------------------------------------------\n";
+    cout << right << setw(40) << "Grand Total: $" << fixed << setprecision(2) << grandTotal << endl;
+}
