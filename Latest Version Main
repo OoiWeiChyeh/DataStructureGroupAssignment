@@ -15,6 +15,7 @@ void sendToKitchen(Queue<Order>& orderQueue, Queue<Order>& kitchenQueue);
 void processQueue(Queue<Order>& kitchenQueue);
 void displayOrderSummary(Queue<Order>& orderQueue);
 void displayKitchenQueue(Queue<Order>& kitchenQueue);
+void kitchenQueueMenu(Queue<Order>& kitchenQueue); 
 
 int main() {
     Pizza pizzas[10];
@@ -41,21 +42,26 @@ int main() {
             case 1:
                 takeOrder(orderQueue, pizzas, pizzaCount);
                 displayOrderSummary(orderQueue);
-                char confirm;
+                
+                char confirm; 
                 cout << "Confirm send to the kitchen [Y/N]: ";
                 cin >> confirm;
-                if (tolower(confirm) == 'y') {
-                    while (!orderQueue.isEmpty()) {
-                        kitchenQueue.enqueue(orderQueue.getFront());
-                        orderQueue.dequeue();
-                        
+                
+                if (tolower(confirm) == 'y') { 
+                    sendToKitchen(orderQueue, kitchenQueue);
+                    cout << "Order sent to the kitchen successfully.\n";
+                    
+                    //call the kitchen queue menu
+                    kitchenQueueMenu(kitchenQueue);
                     }
-                }
+                
                 break;
+                
             case 2:
-                displayKitchenQueue(kitchenQueue);
+            	sendToKitchen(orderQueue, kitchenQueue);
+                kitchenQueueMenu(kitchenQueue);
                 break;
-            case 3:
+            case 3: 
             	cout << "Exiting..." << endl;
             	break;
             default:
