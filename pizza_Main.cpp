@@ -1,54 +1,57 @@
 #include "pizza.h"
 #include <iostream>
-#include <iomanip>
-
-// Function prototypes
-void loadPizzas(Pizza pizzas[], int& count);
-void displayMenu(const Pizza pizzas[], int count);
-void takeOrder(Queue<string>& orderQueue, const Pizza pizzas[], int count);
-void sendToKitchen(Queue<string>& orderQueue, Queue<string>& kitchenQueue);
-void processQueue(Queue<string>& kitchenQueue);
 
 int main() {
     Pizza pizzas[10];
-    int pizzaCount;
+    int pizzaCount = 0;
 
     // Load pizzas from file
-    loadPizzas(pizzas, pizzaCount);
+    loadPizzas(pizzas, pizzaCount, "pizza.txt");
 
-    // Queue for orders and kitchen processing
-    Queue<string> orderQueue;
-    Queue<string> kitchenQueue;
+    // Queues for orders and kitchen
+    queue<Order> orderQueue;
+    queue<Order> kitchenQueue;
 
     int option = 0;
-    cout << "Pizza Kitchen Display System\n";
     while (option != 3) {
-        cout << "\n1 [Order Pizza            ]\n";
-        cout << "2 [Kitchen                ]\n";
-        cout << "3 [Exit                   ]\n\n";
-        cout << "Enter Option: ";
+        cout << "\n1. [Order Pizza]\n";
+        cout << "2. [Kitchen]\n";
+        cout << "3. [Exit]\n";
+        cout << "Select an option: ";
         cin >> option;
 
         switch (option) {
             case 1:
-                if (pizzaCount > 0) {
-                    takeOrder(orderQueue, pizzas, pizzaCount);
-                    cout << endl;
-                } else {
-                    cout << "No pizzas available for ordering.\n"<<endl;
+                displayMenu(pizzas, pizzaCount);
+                takeOrder(orderQueue, pizzas, pizzaCount);
+                displayOrderSummary(orderQueue);
+
+                char confirm;
+                cout << "Confirm send to the kitchen [Y/N]: ";
+                cin >> confirm;
+                if (tolower(confirm) == 'y') {
+                    sendToKitchen(orderQueue, kitchenQueue);
+                    cout << "Order sent to kitchen.\n";
                 }
                 break;
+
             case 2:
-                sendToKitchen(orderQueue, kitchenQueue);
-                processQueue(kitchenQueue);
+                if (kitchenQueue.empty()) {
+                    cout << "No pizzas in the kitchen queue.\n";
+                } else {
+                    kitchenQueueMenu(kitchenQueue);
+                }
                 break;
+
             case 3:
                 cout << "Exiting...\n";
                 break;
+
             default:
-                cout << "Invalid option. Try again.\n";
+                cout << "Invalid input. Try again.\n";
         }
     }
+
     return 0;
 }
 

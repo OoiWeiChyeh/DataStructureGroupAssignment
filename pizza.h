@@ -2,64 +2,37 @@
 #define PIZZA_H
 
 #include <iostream>
+#include <queue>
 #include <string>
-
 using namespace std;
 
+// Class for Pizza details
 class Pizza {
 public:
     string name;
-    float smallPrice, mediumPrice, largePrice, extraLargePrice;
+    string size;
+    int quantity;
 
-    // Constructor to initialize pizza details
-    Pizza(const string& name = "", float small = 0, float medium = 0, float large = 0, float xl = 0)
-        : name(name), smallPrice(small), mediumPrice(medium), largePrice(large), extraLargePrice(xl) {}
+    Pizza(string n = "", string s = "", int q = 0);
 };
 
-// Queue implementation for order and kitchen queue management
-template<typename T>
-class Queue {
-private:
-    struct Node {
-        T data;
-        Node* next;
-    };
-    Node* front;
-    Node* rear;
-
+// Class for Order details
+class Order {
 public:
-    Queue() : front(nullptr), rear(nullptr) {}
+    Pizza pizza;
+    int orderId;
 
-    bool isEmpty() const { return front == nullptr; }
-
-    void enqueue(const T& item) {
-        Node* newNode = new Node{item, nullptr};
-        if (rear) {
-            rear->next = newNode;
-        } else {
-            front = newNode;
-        }
-        rear = newNode;
-    }
-
-    void dequeue() {
-        if (!isEmpty()) {
-            Node* temp = front;
-            front = front->next;
-            delete temp;
-            if (!front) rear = nullptr;
-        }
-    }
-
-    T getFront() const {
-        if (isEmpty()) throw "Queue is empty!";
-        return front->data;
-    }
-
-    ~Queue() {
-        while (!isEmpty()) dequeue();
-    }
+    Order(int id = 0, Pizza p = Pizza());
 };
 
-#endif
+// Function declarations
+void loadPizzas(Pizza pizzas[], int& count, const string& filename);
+void displayMenu(const Pizza pizzas[], int count);
+void takeOrder(queue<Order>& orderQueue, const Pizza pizzas[], int count);
+void displayOrderSummary(const queue<Order>& orderQueue);
+void sendToKitchen(queue<Order>& orderQueue, queue<Order>& kitchenQueue);
+void displayKitchenQueue(const queue<Order>& kitchenQueue);
+void kitchenQueueMenu(queue<Order>& kitchenQueue);
+
+#endif // PIZZA_H
 
