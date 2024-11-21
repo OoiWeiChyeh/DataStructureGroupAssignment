@@ -6,15 +6,19 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 int currentOrderID = 1;
 
-using namespace std;
+// Utility Functions
+// -----------------
 
 // Function to generate a new order ID
 string generateOrderID() {
     return "P" + to_string(currentOrderID++);
 }
 
+// Function to trim whitespace
 string trim(const string& str) {
     size_t first = str.find_first_not_of(" \t");
     size_t last = str.find_last_not_of(" \t");
@@ -76,43 +80,118 @@ void loadPizzas(Pizza pizzas[], int& count) {
     }
 }
 
+// Display Functions
+// -----------------
 
+// Function to display available pizzas
+void displayMenu(const Pizza pizzas[], int count) {
+    cout << "\n=================================== Pizza Menu =================================\n\n";
+    cout << left << setw(25) << "[Pizza Name]" << setw(15) << "Small ($)" << setw(15)
+         << "Medium ($)" << setw(15) << "Large ($)" << setw(15) << "XL ($)" << endl;
+    cout << "--------------------------------------------------------------------------------\n\n";
+    for (int i = 0; i < count; i++) {
+        cout << i + 1 << ". " << left << setw(18) << pizzas[i].name
+             << right << fixed << setw(12) << setprecision(2) << pizzas[i].smallPrice
+             << setw(16) << pizzas[i].mediumPrice
+             << setw(12) << pizzas[i].largePrice
+             << setw(15) << pizzas[i].extraLargePrice << endl;
+    }
+}
 
-//function to display order summary
-void displayOrderSummary(Queue<Order>& orderQueue){
-	float total = 0.0;
-	int i = 1;
-	
-	cout << "{Order Summary}:\n\n";
-	cout << left << "Pizza " << right << setw(24) << " Quantity " << right << setw(15) << " Total\n";
-	cout << setfill('-') << setw(44) << "-" << setfill(' ') << endl << endl; 
-	
-	
-	Queue<Order> tempQueue = orderQueue;
-	while (!tempQueue.isEmpty()){
-		Order order = tempQueue.getFront();
-		float itemTotal = order.priceItem;
-		total += itemTotal;
-		
-		cout << left << i++ << "." << setw(18) << order.pizzaName
-			 << right << setw(8) << order.quantity << right << setw(16) << fixed << setprecision(2) << itemTotal << endl;
-			 
-		tempQueue.dequeue();
-	}
-	double tax = total * 0.05;
+void takeOrder(Queue<Order>& orderQueue, const Pizza pizzas[], int count) {
+    string orderID = generateOrderID();
+    float total = 0.0;
+    char continueOrder;
+
+    cout << "\n\nOrder ID: " << orderID << "\n";
+
+    do {
+        int pizzaChoice = 0, sizeChoice = 0, quantity = 0;
+
+        displayMenu(pizzas, count);
+        cout << "\nSelect Pizza: ";
+        cin >> pizzaChoice;
+        cout << endl;
+        if (pizzaChoice < 1 || pizzaChoice > count) {
+            cout << "Invalid pizza selection.\n";
+            return;
+        }
+
+        const Pizza& selectedPizza = pizzas[pizzaChoice - 1];
+        cout << selectedPizza.name << " Price List\n\n";
+        cout << "1 [Personal - RM  " << selectedPizza.smallPrice << "]\n";
+        cout << "2 [Regular  - RM " << selectedPizza.mediumPrice << "]\n";
+        cout << "3 [Large    - RM " << selectedPizza.largePrice << "]\n";
+        cout << "4 [XLarge   - RM " << selectedPizza.extraLargePrice << "]\n\n";
+        cout << "Select Pizza Size: ";
+        cin >> sizeChoice;
+
+        while (sizeChoice < 1 || sizeChoice > 4) {
+            cout << "Please select the size that we have....\n";
+            cout << "---------------------------------------\n";
+            cout << "Select Pizza Size: ";
+            cin >> sizeChoice;
+        }
+
+        cout << "Enter Quantity: ";
+        cin >> quantity;
+
+        // Calculate price based on size and quantity
+        float price = 0.0;
+        string sizeName;
+        switch (sizeChoice) {
+            case 1: price = selectedPizza.smallPrice * quantity; sizeName = "Personal"; break;
+            case 2: price = selectedPizza.mediumPrice * quantity; sizeName = "Regular"; break;
+            case 3: price = selectedPizza.largePrice * quantity; sizeName = "Large"; break;
+            case 4: price = selectedPizza.extraLargePrice * quantity; sizeName = "XLarge"; break;
+        }
+
+        Order newOrder(orderID, selectedPizza.name, sizeChoice, quantity, price);
+        orderQueue.enqueue(newOrder);
+
+        cout << "Added to order: " << selectedPizza.name << " x" << quantity << endl;
+
+        // Prompt to continue ordering
+        cout << "\nContinue next pizza [Y/N]: ";
+        cin >> continueOrder;
+        cout << endl;
+    } while (tolower(continueOrder) == 'y');
+}
+
+// Function to display order summary
+void displayOrderSummary(Queue<Order>& orderQueue) {
+    float total = 0.0;
+    int i = 1;
+
+    cout << "{Order Summary}:\n\n";
+    cout << left << "Pizza " << right << setw(24) << " Quantity " << right << setw(15) << " Total\n";
+    cout << setfill('-') << setw(44) << "-" << setfill(' ') << endl << endl; 
+
+    Queue<Order> tempQueue = orderQueue;
+    while (!tempQueue.isEmpty()) {
+        Order order = tempQueue.getFront();
+        float itemTotal = order.priceItem;
+        total += itemTotal;
+
+        cout << left << i++ << "." << setw(18) << order.pizzaName
+             << right << setw(8) << order.quantity << right << setw(16) << fixed << setprecision(2) << itemTotal << endl;
+
+        tempQueue.dequeue();
+    }
+    double tax = total * 0.05;
     double lastTotal = total + tax;
     cout << "--------------------------------------------\n";
-    cout << "TAX(5%) " << right << setw(15) << " : " << tax << endl;
+    cout << "TAX(5%)  " << right << setw(15) << " : " << tax << endl;
     cout << "TOTAL (RM)            :" << lastTotal << endl;
 }
 
 // Function to display kitchen queue
 void displayKitchenQueue(Queue<Order>& kitchenQueue) {
-	if(kitchenQueue.isEmpty()){
-		cout << "No orders in the kitchen queue.\n";
-		return;
-	}
-	
+    if (kitchenQueue.isEmpty()) {
+        cout << "No orders in the kitchen queue.\n";
+        return;
+    }
+
     Queue<Order> tempQueue = kitchenQueue;
     int orderNum = 1;
 
@@ -130,110 +209,35 @@ void displayKitchenQueue(Queue<Order>& kitchenQueue) {
         cout << "| [" << orderNum++ << "] " << order.pizzaName << "-" << size
              << " x " << order.quantity << "       | [Preparing...]\n";
         cout << "+----------------------------+\n";
-        
+
         tempQueue.dequeue();
         if (!tempQueue.isEmpty()) cout << "          |\n          |\n          V\n";
     }
 }
 
-// Function to display available pizzas
-void displayMenu(const Pizza pizzas[], int count) {
-    cout << "\n=================================== Pizza Menu =================================\n\n";
-    cout << left << setw(25) << "[Pizza Name]" << setw(15) << "Small ($)" << setw(15)
-         << "Medium ($)" << setw(15) << "Large ($)" << setw(15) << "XL ($)" << endl;
-    cout << "--------------------------------------------------------------------------------\n\n";
-    for (int i = 0; i < count; i++) {
-        cout << i + 1 << ". " << left << setw(18) << pizzas[i].name
-             << right << fixed << setw(12) << setprecision(2) << pizzas[i].smallPrice
-             << setw(16) << pizzas[i].mediumPrice
-             << setw(12) << pizzas[i].largePrice
-             << setw(15) << pizzas[i].extraLargePrice << endl;
-    }
-}
-
-
-
+// Ordering Functions
+// ------------------
 
 // Function to handle ordering
-void takeOrder(Queue<Order>& orderQueue, const Pizza pizzas[], int count) {
-    string orderID = generateOrderID();
-    float total = 0.0;
-    char continueOrder;
 
-    cout << "\n\nOrder ID: " << orderID << "\n";
-
-    do {
-        int pizzaChoice = 0, sizeChoice = 0, quantity = 0;
-
-        displayMenu(pizzas, count);
-        cout << "\nSelect Pizza: ";
-        cin >> pizzaChoice;
-		cout << endl;
-        if (pizzaChoice < 1 || pizzaChoice > count) {
-            cout << "Invalid pizza selection.\n";
-            return;
-        }
-
-        const Pizza& selectedPizza = pizzas[pizzaChoice - 1];
-        cout << selectedPizza.name << " Price List\n\n";
-        cout << "1 [Personal - RM " << selectedPizza.smallPrice << "]\n";
-        cout << "2 [Regular  - RM " << selectedPizza.mediumPrice << "]\n";
-        cout << "3 [Large    - RM " << selectedPizza.largePrice << "]\n";
-        cout << "4 [XLarge   - RM " << selectedPizza.extraLargePrice << "]\n\n";
-        cout << "Select Pizza Size: ";
-        cin >> sizeChoice;
-
-        while (sizeChoice < 1 || sizeChoice > 4){
-        	cout << "Please select the size that we have....\n";
-        	cout << "---------------------------------------\n";
-        	cout << "Select Pizza Size: ";
-        	cin >> sizeChoice;
-		}
-
-        cout << "Enter Quantity: ";
-        cin >> quantity;
-
-        // Calculate price based on size and quantity
-        float price = 0.0;
-        string sizeName;
-        switch (sizeChoice) {
-            case 1: price = selectedPizza.smallPrice * quantity; sizeName = "Personal"; break;
-            case 2: price = selectedPizza.mediumPrice * quantity; sizeName = "Regular"; break;
-            case 3: price = selectedPizza.largePrice * quantity; sizeName = "Large"; break;
-            case 4: price = selectedPizza.extraLargePrice * quantity; sizeName = "XLarge"; break;
-        }
-
-        
-
-        Order newOrder(orderID, selectedPizza.name, sizeChoice, quantity, price);
-        orderQueue.enqueue(newOrder);
-
-        cout << "Added to order: " << selectedPizza.name << " x" << quantity << endl;
-
-        // Prompt to continue ordering
-        cout << "\nContinue next pizza [Y/N]: ";
-        cin >> continueOrder;
-		cout << endl;
-    } while (tolower(continueOrder) == 'y' );
-
-    
-}
 
 // Function to send orders to kitchen queue
 void sendToKitchen(Queue<Order>& orderQueue, Queue<Order>& kitchenQueue) {
-    if(orderQueue.isEmpty()){
-    	cout << "Don't have any order send to the kitchen.\n";
-    	return;
-	}
-	while (!orderQueue.isEmpty()) {
+    if (orderQueue.isEmpty()) {
+        cout << "Don't have any order send to the kitchen.\n";
+        return;
+    }
+    while (!orderQueue.isEmpty()) {
         kitchenQueue.enqueue(orderQueue.getFront());
         orderQueue.dequeue();
     }
-    cout <<"All orders have been successfully sent to the kitchen.\n";
-	 
+    cout << "All orders have been successfully sent to the kitchen.\n";
 }
 
+// Kitchen Queue Management Functions
+// ----------------------------------
 
+// Function to manage the kitchen queue
 void kitchenQueueMenu(Queue<Order>& kitchenQueue) {
     int choice;
     do {
@@ -247,43 +251,29 @@ void kitchenQueueMenu(Queue<Order>& kitchenQueue) {
         cin >> choice;
 
         switch (choice) {
-            case 1:
+            case 1: // Prepare next pizza
                 if (!kitchenQueue.isEmpty()) {
-                    cout << "Preparing: " << kitchenQueue.getFront().pizzaName << endl;
                     kitchenQueue.dequeue();
+                    cout << "Next pizza is being prepared.\n";
                 } else {
-                    cout << "No pizzas in the queue." << endl;
+                    cout << "No pizzas to prepare.\n";
                 }
                 break;
-            case 2: {
-                if (!kitchenQueue.isEmpty()) {
-                    cout << "Cancelling: " << kitchenQueue.getFront().pizzaName << endl;
-                    kitchenQueue.dequeue();
-                } else {
-                    cout << "No pizzas to cancel." << endl;
-                }
+            case 2: // Cancel pizza
+                cout << "Cancel functionality coming soon.\n";
                 break;
-            }
-            case 3: {
-                string pizzaName;
-                int size, quantity;
-                cout << "Enter pizza name, size (1-4), and quantity: ";
-                cin >> pizzaName >> size >> quantity;
-                Order newOrder("Custom", pizzaName, size, quantity, 0);
-                kitchenQueue.enqueue(newOrder);
-                cout << "Pizza inserted into queue." << endl;
+            case 3: // Insert pizza
+                cout << "Insert functionality coming soon.\n";
                 break;
-            }
-            case 4:
-                kitchenQueue.resetQueue();
-                cout << "Queue has been reset." << endl;
+            case 4: // Reset queue
+                while (!kitchenQueue.isEmpty()) kitchenQueue.dequeue();
+                cout << "Kitchen queue has been reset.\n";
                 break;
             case 5:
-                cout << "Exiting kitchen management.\n";
+                cout << "Exiting kitchen queue management.\n";
                 break;
             default:
-                cout << "Invalid option.\n";
+                cout << "Invalid choice. Try again.\n";
         }
     } while (choice != 5);
 }
-
