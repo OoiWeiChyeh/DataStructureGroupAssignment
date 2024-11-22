@@ -1,38 +1,27 @@
+
 #ifndef PIZZA_H
 #define PIZZA_H
 
-#include <iostream>
-#include <queue>
 #include <string>
+#include <iostream>
 using namespace std;
 
-// Class for Pizza details
 class Pizza {
 public:
     string name;
-    string size;
-    int quantity;
+    float smallPrice, mediumPrice, largePrice, extraLargePrice;
 
-    Pizza(string n = "", string s = "", int q = 0);
+    // Default and parameterized constructor
+    Pizza(const string& name = "", float small = 0.0, float medium = 0.0, float large = 0.0, float xl = 0.0)
+        : name(name), smallPrice(small), mediumPrice(medium), largePrice(large), extraLargePrice(xl) {}
+
+    // Display pizza details
+    void display() const {
+        cout << "Pizza: " << name << endl
+             << "Small: $" << smallPrice << " Medium: $" << mediumPrice
+             << " Large: $" << largePrice << " Extra Large: $" << extraLargePrice << endl;
+    }
 };
-
-// Class for Order details
-class Order {
-public:
-    Pizza pizza;
-    int orderId;
-
-    Order(int id = 0, Pizza p = Pizza());
-};
-
-// Function declarations
-void loadPizzas(Pizza pizzas[], int& count, const string& filename);
-void displayMenu(const Pizza pizzas[], int count);
-void takeOrder(queue<Order>& orderQueue, const Pizza pizzas[], int count);
-void displayOrderSummary(const queue<Order>& orderQueue);
-void sendToKitchen(queue<Order>& orderQueue, queue<Order>& kitchenQueue);
-void displayKitchenQueue(const queue<Order>& kitchenQueue);
-void kitchenQueueMenu(queue<Order>& kitchenQueue);
 
 #endif // PIZZA_H
 
